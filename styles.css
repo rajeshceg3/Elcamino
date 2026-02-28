@@ -1,0 +1,250 @@
+:root {
+  color-scheme: light;
+  --bg: #f6f2eb;
+  --bg-soft: #fffdfa;
+  --surface: #ffffff;
+  --text: #2d2a26;
+  --muted: #5f5952;
+  --accent: #4b7f52;
+  --accent-deep: #2f5e3a;
+  --line: #dfd7cc;
+  --shadow: 0 20px 40px rgba(32, 28, 21, 0.12);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  color: var(--text);
+  background: linear-gradient(180deg, #f3efe8 0%, #fbf8f3 60%, #f2ece2 100%);
+  line-height: 1.6;
+}
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+}
+
+.skip-link:focus {
+  left: 1rem;
+  top: 1rem;
+  background: var(--surface);
+  padding: 0.6rem 1rem;
+  border-radius: 0.5rem;
+  z-index: 100;
+}
+
+.hero {
+  position: relative;
+  min-height: 78vh;
+  padding: 1.5rem clamp(1rem, 3vw, 3rem) 5rem;
+  background: radial-gradient(circle at 20% 0%, #ffefce 0, transparent 32%),
+    radial-gradient(circle at 90% 20%, #d3ecd8 0, transparent 35%),
+    linear-gradient(180deg, #f8f3ea 0%, #efe6d9 100%);
+  overflow: hidden;
+}
+
+.hero-gradient {
+  position: absolute;
+  inset: auto 0 0;
+  height: 130px;
+  background: linear-gradient(to top, #fbf8f3, transparent);
+}
+
+.top-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.brand {
+  font-family: "Playfair Display", serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.sound-toggle,
+.cta {
+  border: 0;
+  border-radius: 999px;
+  padding: 0.75rem 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.sound-toggle {
+  background: rgba(47, 94, 58, 0.12);
+  color: var(--accent-deep);
+}
+
+.cta {
+  background: var(--accent);
+  color: #fff;
+}
+
+.sound-toggle:hover,
+.cta:hover {
+  transform: translateY(-1px);
+}
+
+.hero-content {
+  max-width: 760px;
+  margin-top: clamp(2rem, 7vh, 5rem);
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-bottom: 0.75rem;
+}
+
+h1,
+h2,
+h3 {
+  font-family: "Playfair Display", serif;
+  line-height: 1.2;
+}
+
+h1 {
+  font-size: clamp(2rem, 6vw, 4rem);
+  margin: 0;
+}
+
+.hero-copy {
+  max-width: 65ch;
+  font-size: 1.05rem;
+  margin: 1.5rem 0 2rem;
+}
+
+main {
+  padding: 0 clamp(1rem, 3vw, 3rem) 4rem;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-top: -3rem;
+}
+
+.stats article {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  padding: 1rem;
+  box-shadow: var(--shadow);
+}
+
+.stats h2 {
+  margin: 0;
+  font-size: 1.6rem;
+}
+
+.journey,
+.reflection {
+  margin-top: 4rem;
+}
+
+.timeline {
+  list-style: none;
+  margin: 2rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 1rem;
+}
+
+.timeline-stage {
+  display: grid;
+  grid-template-columns: 1.2rem 1fr;
+  gap: 1rem;
+  padding: 1.2rem;
+  border-radius: 1rem;
+  background: var(--bg-soft);
+  border: 1px solid var(--line);
+}
+
+.stage-marker {
+  width: 0.95rem;
+  height: 0.95rem;
+  border-radius: 50%;
+  background: #c4b9a8;
+  margin-top: 0.45rem;
+  transition: transform 0.25s ease, background-color 0.25s ease;
+}
+
+.timeline-stage.is-active {
+  border-color: #adc8b1;
+  background: #f5fbf6;
+}
+
+.timeline-stage.is-active .stage-marker {
+  background: var(--accent);
+  transform: scale(1.2);
+}
+
+.timeline-stage h3 {
+  margin: 0 0 0.4rem;
+}
+
+.timeline-stage p {
+  margin: 0;
+  color: #3a362f;
+}
+
+.reflection {
+  display: grid;
+  gap: 1.2rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 1.2rem;
+  padding: clamp(1rem, 3vw, 2rem);
+  box-shadow: var(--shadow);
+}
+
+.intention-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 0.8rem;
+}
+
+.intention-form label {
+  width: 100%;
+  font-weight: 600;
+}
+
+select {
+  border: 1px solid #bdb2a0;
+  background: #fff;
+  border-radius: 0.6rem;
+  padding: 0.7rem 0.8rem;
+  min-width: 240px;
+  font-size: 1rem;
+}
+
+.reflection-card {
+  border-left: 4px solid var(--accent);
+  padding: 1rem;
+  background: #f5fbf6;
+  border-radius: 0.6rem;
+}
+
+.footer {
+  padding: 2rem 1rem 3rem;
+  text-align: center;
+  color: var(--muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    scroll-behavior: auto !important;
+    transition: none !important;
+  }
+}
