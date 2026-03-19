@@ -53,8 +53,8 @@
           <p>Portugal and Spain</p>
         </article>
         <article>
-          <h2>∞ moments</h2>
-          <p>Joyful discoveries</p>
+          <h2 id="visited-count">0 / 5</h2>
+          <p>Stages felt so far</p>
         </article>
       </section>
 
@@ -62,52 +62,63 @@
         <div class="section-heading">
           <p class="eyebrow">Immersive trail diary</p>
           <h2 id="journey-title">Walk with me, stage by stage</h2>
+          <p id="journey-companion" class="journey-companion" aria-live="polite">
+            Start scrolling and I will gently guide your pace.
+          </p>
+          <div class="journey-progress" role="progressbar" aria-label="Journey progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+            <span id="journey-progress-fill"></span>
+          </div>
         </div>
 
         <ol class="timeline">
-          <li class="timeline-stage" data-stage="0">
+          <li class="timeline-stage" data-stage="0" tabindex="0">
             <div class="stage-marker" aria-hidden="true"></div>
             <article>
               <h3>Day 1 · Porto, Portugal</h3>
               <p>
                 Dawn poured gold over the Douro River as I tightened my backpack straps and stepped into the hum of Porto. Church bells chimed softly, and every azulejo tile seemed to whisper, “Buen Camino.” I felt nervous, then suddenly grateful—like my life had opened a new page.
               </p>
+              <button class="stamp-button" type="button" aria-pressed="false">Collect this memory stamp</button>
             </article>
           </li>
-          <li class="timeline-stage" data-stage="1">
+          <li class="timeline-stage" data-stage="1" tabindex="0">
             <div class="stage-marker" aria-hidden="true"></div>
             <article>
               <h3>Day 4 · Coastal Breeze near Vila do Conde</h3>
               <p>
                 The Atlantic walked beside me. Boardwalk planks warmed under the sun, gulls traced bright circles above, and fellow pilgrims from five different countries shared fruit and stories. We laughed in many accents, yet somehow spoke one language: wonder.
               </p>
+              <button class="stamp-button" type="button" aria-pressed="false">Collect this memory stamp</button>
             </article>
           </li>
-          <li class="timeline-stage" data-stage="2">
+          <li class="timeline-stage" data-stage="2" tabindex="0">
             <div class="stage-marker" aria-hidden="true"></div>
             <article>
               <h3>Day 7 · Crossing into Spain</h3>
               <p>
                 I crossed the Minho and entered Galicia with mist on my cheeks and joy in my chest. A café owner in Tui stamped my credential and handed me warm tortilla. That first bite tasted like home, even though I was far from it.
               </p>
+              <button class="stamp-button" type="button" aria-pressed="false">Collect this memory stamp</button>
             </article>
           </li>
-          <li class="timeline-stage" data-stage="3">
+          <li class="timeline-stage" data-stage="3" tabindex="0">
             <div class="stage-marker" aria-hidden="true"></div>
             <article>
               <h3>Day 10 · Forest paths to Pontevedra</h3>
               <p>
                 Eucalyptus and pine perfumed the trail. My footsteps found a rhythm: breathe, look up, smile. In tiny villages, elders waved from stone doorways, and I kept hearing a phrase that became my heartbeat: “Despacio también se llega”—slowly, you also arrive.
               </p>
+              <button class="stamp-button" type="button" aria-pressed="false">Collect this memory stamp</button>
             </article>
           </li>
-          <li class="timeline-stage" data-stage="4">
+          <li class="timeline-stage" data-stage="4" tabindex="0">
             <div class="stage-marker" aria-hidden="true"></div>
             <article>
               <h3>Day 14 · Santiago de Compostela</h3>
               <p>
                 When the cathedral towers appeared, tears came before I could stop them. I reached Praza do Obradoiro as musicians played nearby, strangers hugged like family, and the stones under my boots felt sacred. I came seeking perspective. I found joy, clarity, and belonging.
               </p>
+              <button class="stamp-button" type="button" aria-pressed="false">Collect this memory stamp</button>
             </article>
           </li>
         </ol>
