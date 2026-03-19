@@ -8,6 +8,7 @@ An immersive, first-person web experience inspired by the **Camino Portugués** 
 - Clean and refined visual design.
 - Accessibility-forward implementation (semantic HTML, keyboard-friendly controls, reduced-motion support, live region updates).
 - Lightweight architecture with progressive enhancement.
+- Low-clutter engagement mechanics (journey progress companion, memory stamps, adaptive visual mood).
 
 ## Run locally
 

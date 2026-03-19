@@ -21,6 +21,19 @@ body {
   color: var(--text);
   background: linear-gradient(180deg, #f3efe8 0%, #fbf8f3 60%, #f2ece2 100%);
   line-height: 1.6;
+  transition: background 0.35s ease;
+}
+
+body[data-mood='coast'] {
+  background: linear-gradient(180deg, #eef6f9 0%, #f8fbfb 55%, #f1f5f2 100%);
+}
+
+body[data-mood='forest'] {
+  background: linear-gradient(180deg, #eef3eb 0%, #f9faf6 55%, #f0f2e9 100%);
+}
+
+body[data-mood='arrival'] {
+  background: linear-gradient(180deg, #f8f1e3 0%, #fff8ef 58%, #f3ebdd 100%);
 }
 
 .skip-link {
@@ -152,6 +165,29 @@ main {
   margin-top: 4rem;
 }
 
+.journey-companion {
+  max-width: 55ch;
+  margin-top: 0.7rem;
+  color: var(--muted);
+}
+
+.journey-progress {
+  margin-top: 0.8rem;
+  background: #e9e2d8;
+  border-radius: 999px;
+  height: 0.6rem;
+  overflow: hidden;
+}
+
+.journey-progress span {
+  display: block;
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #5e8e65 0%, #8cbd95 100%);
+  transition: width 0.35s ease;
+}
+
 .timeline {
   list-style: none;
   margin: 2rem 0 0;
@@ -168,6 +204,11 @@ main {
   border-radius: 1rem;
   background: var(--bg-soft);
   border: 1px solid var(--line);
+}
+
+.timeline-stage:focus-visible {
+  outline: 2px solid #8db195;
+  outline-offset: 2px;
 }
 
 .stage-marker {
@@ -196,6 +237,23 @@ main {
 .timeline-stage p {
   margin: 0;
   color: #3a362f;
+}
+
+.stamp-button {
+  margin-top: 0.8rem;
+  border: 1px solid #bfd3c3;
+  border-radius: 999px;
+  padding: 0.45rem 0.75rem;
+  background: #fff;
+  color: #31573a;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.stamp-button[aria-pressed='true'] {
+  background: #e7f3e9;
+  border-color: #8bb593;
 }
 
 .reflection {
