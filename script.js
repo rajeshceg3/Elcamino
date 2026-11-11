@@ -1,150 +1,53 @@
-const timelineStages = [...document.querySelectorAll('.timeline-stage')];
-const beginButton = document.getElementById('begin-journey');
-const soundToggle = document.getElementById('sound-toggle');
-const ambientAudio = document.getElementById('ambient-audio');
-const intentionForm = document.getElementById('intention-form');
-const reflectionCard = document.getElementById('reflection-card');
-const companionText = document.getElementById('journey-companion');
-const progressBar = document.querySelector('.journey-progress');
-const progressFill = document.getElementById('journey-progress-fill');
-const visitedCount = document.getElementById('visited-count');
-const stampButtons = [...document.querySelectorAll('.stamp-button')];
-
-const reflections = {
-  healing:
-    'As I walked out of Porto, I let each mile absorb what I could not carry anymore. By the time I reached Santiago, my body was tired, but my spirit felt newly spacious. Healing happened quietly, one honest step at a time.',
-  clarity:
-    "The Camino gave me clarity by simplifying everything: walk, breathe, notice, rest, repeat. Somewhere between Galicia's forests and village cafés, the next chapter of my life became less frightening and more obvious.",
-  connection:
-    'I arrived alone, yet never truly walked alone. A shared orange, a kind smile, a whispered “Buen Camino” made me feel deeply seen. Connection on this trail was not loud—it was steady, generous, and real.',
-  gratitude:
-    'I discovered gratitude in ordinary miracles: dry socks after rain, warm bread at dawn, church bells at sunset, and strangers who became friends. Joy stopped being a destination and became my walking companion.'
-};
-
-const companionLines = [
-  'Porto is behind us. Keep your pace gentle and curious.',
-  'The coast opens up—let wonder do more of the talking.',
-  'New country, same heart. Notice what already feels familiar.',
-  'The forest teaches rhythm: breathe, step, soften.',
-  'Santiago is here. Pause and feel what this walk changed.'
+import * as THREE from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+import diary from './diary.json';
+const places=[
+{name:'Porto, by the Douro',detail:'Terracotta roofs step down toward the Douro. An iron arch recalls the D. Luís bridge, with tiled houses lining the riverbank.',source:'https://www.visitportugal.com/en/print/sugestao/73735',sourceName:'Visit Portugal',color:0xa5c5c2,kind:'porto',camera:[17,12,23]},
+{name:'The Atlantic boardwalk',detail:'A timber path winds between pale dunes and the open Atlantic. This coastal chapter is inspired by the shoreline near Vila do Conde.',source:'https://www.caminodesantiago.gal/en/make-plans/the-ways/portuguese-coastal-way',sourceName:'Xunta de Galicia',color:0xa2c4ce,kind:'coast',camera:[17,10,21]},
+{name:'Tui, across the Miño',detail:'A riverside crossing and a fortified hilltop cathedral recall Tui. This is on the inland Portuguese Way, not the coastal entry at A Guarda.',source:'https://tui.gal/en/turismo/vive-e-conoce/santa-maria-cathedral',sourceName:'Tui Tourism',color:0xb4c8c4,kind:'tui',camera:[18,12,23]},
+{name:'Paths toward Pontevedra',detail:'Pine canopies, mossy stone and a yellow waymark frame the path. Pontevedra lies on the shared approach after the routes meet at Redondela.',source:'https://www.caminodesantiago.gal/en/make-plans/the-ways/portuguese-way',sourceName:'Xunta de Galicia',color:0xa6bbb0,kind:'forest',camera:[14,9,18]},
+{name:'Santiago, at last',detail:'Twin towers, a central stone façade and a broad stairway evoke the cathedral above Praza do Obradoiro. Pause in the square and look up.',source:'https://www.santiagoturismo.com/videoguias/fachada-de-la-catedral',sourceName:'Santiago Tourism',color:0xcbbfae,kind:'santiago',camera:[19,13,27]}
 ];
-
-const moodByStage = ['default', 'coast', 'coast', 'forest', 'arrival'];
-const visitedStages = new Set();
-const collectedStamps = new Set();
-
-const updateProgressUI = (stageIndex) => {
-  const totalStages = timelineStages.length;
-  const percent = Math.round(((stageIndex + 1) / totalStages) * 100);
-
-  progressFill.style.width = `${percent}%`;
-  progressBar?.setAttribute('aria-valuenow', String(percent));
-  if (companionText) {
-    companionText.textContent = companionLines[stageIndex] ?? companionLines[0];
-  }
-
-  const mood = moodByStage[stageIndex] ?? 'default';
-  if (mood === 'default') {
-    document.body.removeAttribute('data-mood');
-  } else {
-    document.body.setAttribute('data-mood', mood);
-  }
-};
-
-const updateVisitedUI = () => {
-  if (!visitedCount) {
-    return;
-  }
-
-  visitedCount.textContent = `${visitedStages.size} / ${timelineStages.length}`;
-};
-
-const stageObserver = new IntersectionObserver(
-  (entries) => {
-    entries.forEach((entry) => {
-      if (!entry.isIntersecting) {
-        return;
-      }
-
-      const stage = entry.target;
-      const stageIndex = Number(stage.dataset.stage);
-
-      stage.classList.add('is-active');
-      visitedStages.add(stageIndex);
-
-      updateVisitedUI();
-      updateProgressUI(stageIndex);
-    });
-  },
-  {
-    threshold: 0.45
-  }
-);
-
-timelineStages.forEach((stage) => {
-  stageObserver.observe(stage);
-  stage.addEventListener('focus', () => {
-    const stageIndex = Number(stage.dataset.stage);
-    visitedStages.add(stageIndex);
-    stage.classList.add('is-active');
-    updateVisitedUI();
-    updateProgressUI(stageIndex);
-  });
-});
-
-beginButton?.addEventListener('click', () => {
-  document.getElementById('journey-title')?.scrollIntoView({
-    behavior: 'smooth',
-    block: 'start'
-  });
-});
-
-soundToggle?.addEventListener('click', async () => {
-  const isPlaying = !ambientAudio.paused;
-
-  try {
-    if (isPlaying) {
-      ambientAudio.pause();
-      soundToggle.textContent = 'Enable ambient sound';
-      soundToggle.setAttribute('aria-pressed', 'false');
-      return;
-    }
-
-    await ambientAudio.play();
-    soundToggle.textContent = 'Pause ambient sound';
-    soundToggle.setAttribute('aria-pressed', 'true');
-  } catch {
-    soundToggle.textContent = 'Audio unavailable in this browser';
-    soundToggle.disabled = true;
-  }
-});
-
-intentionForm?.addEventListener('submit', (event) => {
-  event.preventDefault();
-
-  const formData = new FormData(intentionForm);
-  const selectedIntention = formData.get('intention');
-  const message = reflections[selectedIntention] ?? reflections.gratitude;
-
-  reflectionCard.innerHTML = `
-    <h3>Your Camino reflection</h3>
-    <p>${message}</p>
-  `;
-});
-
-stampButtons.forEach((button, index) => {
-  button.addEventListener('click', () => {
-    const hasStamp = collectedStamps.has(index);
-
-    if (hasStamp) {
-      collectedStamps.delete(index);
-      button.textContent = 'Collect this memory stamp';
-      button.setAttribute('aria-pressed', 'false');
-      return;
-    }
-
-    collectedStamps.add(index);
-    button.textContent = 'Stamp collected ✓';
-    button.setAttribute('aria-pressed', 'true');
-  });
-});
+let selected=0,motion=!matchMedia('(prefers-reduced-motion: reduce)').matches,stamps=new Set(),seen=new Set();
+try{stamps=new Set(JSON.parse(localStorage.getItem('camino-stamps'))||[]);seen=new Set(JSON.parse(localStorage.getItem('camino-seen'))||[])}catch{}
+const $=s=>document.querySelector(s),canvas=$('#world');
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:false});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.setClearColor(0xa5c5c2);renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.18;
+const scene=new THREE.Scene();const camera=new THREE.PerspectiveCamera(43,1,.1,180);const controls=new OrbitControls(camera,canvas);controls.enableDamping=false;controls.minDistance=12;controls.maxDistance=46;controls.maxPolarAngle=Math.PI*.47;controls.minPolarAngle=.15;controls.enablePan=false;controls.target.set(0,2,0);
+scene.add(new THREE.HemisphereLight(0xfff1d1,0x4b655c,2));const sun=new THREE.DirectionalLight(0xffdca2,3.3);sun.position.set(-12,24,12);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);sun.shadow.camera.left=-24;sun.shadow.camera.right=24;sun.shadow.camera.top=24;sun.shadow.camera.bottom=-24;sun.shadow.bias=-.0005;scene.add(sun);
+let dirty=true;controls.addEventListener('change',()=>dirty=true);let world=new THREE.Group();scene.add(world);let animated=[];
+const mat=(c,roughness=1)=>new THREE.MeshStandardMaterial({color:c,roughness,flatShading:true});const materials={};const M=c=>materials[c]||(materials[c]=mat(c));
+function mesh(g,c,x=0,y=0,z=0,parent=world){const m=new THREE.Mesh(g,typeof c==='number'?M(c):c);m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m}
+function box(w,h,d,c,x=0,y=0,z=0,p=world){return mesh(new THREE.BoxGeometry(w,h,d),c,x,y,z,p)}
+function cyl(r1,r2,h,c,x=0,y=0,z=0,p=world,n=12){return mesh(new THREE.CylinderGeometry(r1,r2,h,n),c,x,y,z,p)}
+function sphere(r,c,x,y,z,p=world,sx=1,sy=1,sz=1){const m=mesh(new THREE.IcosahedronGeometry(r,2),c,x,y,z,p);m.scale.set(sx,sy,sz);return m}
+function beam(a,b,r,c,p=world){const aa=new THREE.Vector3(...a),bb=new THREE.Vector3(...b),m=cyl(r,r,aa.distanceTo(bb),c,0,0,0,p,6);m.position.copy(aa.clone().add(bb).multiplyScalar(.5));m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),bb.sub(aa).normalize());return m}
+function ground(color){cyl(22,23,1.2,0x9b8561,0,-.85,0);cyl(22,22,.3,color,0,-.15,0,world,96);for(let i=0;i<14;i++){const a=i*2.4;const x=Math.cos(a)*19,z=Math.sin(a)*19;sphere(3+i%3,0x718779,x,1,z,world,1,.55,1)}}
+function tree(x,z,scale=1,pine=true){const t=new THREE.Group();t.position.set(x,0,z);t.scale.setScalar(scale);world.add(t);cyl(.12,.24,3.5,0x76583e,0,1.75,0,t,7);if(pine){for(let i=0;i<4;i++)cyl(.05,1.3-i*.22,2, i%2?0x4f7160:0x3f6556,0,2.3+i*.7,0,t,8)}else{for(let i=0;i<5;i++){let a=i*2.4;sphere(1.1,0x829267,Math.cos(a)*.7,3.4+i*.12,Math.sin(a)*.6,t,1,.8,1)}}return t}
+function roof(w,h,d,c,x,y,z,p){const shape=new THREE.Shape();shape.moveTo(-w/2,0);shape.lineTo(w/2,0);shape.lineTo(0,h);shape.closePath();const g=new THREE.ExtrudeGeometry(shape,{depth:d,bevelEnabled:false});const m=mesh(g,c,x,y,z-d/2,p);return m}
+function house(x,z,w=2,h=3,c=0xe8d4a6){const p=new THREE.Group();p.position.set(x,0,z);world.add(p);box(w,h,2.3,c,0,h/2,0,p);roof(w+.3,.9,2.6,0xa95c44,0,h,0,p);for(let row=0;row<2;row++)for(let col=0;col<2;col++){box(.42,.65,.07,0x365b60,(col-.5)*w*.55,1+row*1.15,1.18,p);box(.52,.08,.13,0xf4dfb4,(col-.5)*w*.55,.68+row*1.15,1.21,p)}box(.5,1.1,.08,0x73543c,0,.55,1.19,p);if(c===0x80a9ae){for(let i=0;i<8;i++)for(let j=0;j<5;j++)box(.07,.07,.02,0xe6eee0,(j-2)*.32,.2+i*.35,1.2,p)}return p}
+function water(x,z,w,d){box(w,.15,d,0x599caa,x,.02,z);for(let i=0;i<30;i++){const line=box(.6+(i%4)*.45,.018,.035,i%2?0xc3d4c5:0x90bdba,x+((i*2.65)%w)-w/2,.11,z+((i*1.67)%d)-d/2);animated.push({mesh:line,type:'wave',base:line.position.x,phase:i*.7})}}
+function bridge(x,z,length=13,iron=true){const p=new THREE.Group();p.position.set(x,0,z);world.add(p);const col=iron?0x354b47:0x9d9b7d;box(length,.3,1.8,col,0,3.2,0,p);for(const side of [-.8,.8]){const points=[];for(let i=0;i<=30;i++){const xx=-length/2+length*i/30;points.push(new THREE.Vector3(xx,.6+2.5*Math.sin(Math.PI*i/30),side))}const tube=new THREE.TubeGeometry(new THREE.CatmullRomCurve3(points),60,.12,7,false);mesh(tube,col,0,0,0,p);for(let i=0;i<=12;i++){const xx=-length/2+length*i/12;beam([xx,.6+2.5*Math.sin(Math.PI*i/12),side],[xx,3.15,side],.055,col,p)}beam([-length/2,3.7,side],[length/2,3.7,side],.055,col,p)}for(const xx of [-length/2,length/2])box(.6,3.1,2.3,0xbeb494,xx,1.5,0,p);return p}
+function cross(x,y,z,s,p=world){box(.14*s,1.1*s,.14*s,0x605b4c,x,y,z,p);box(.65*s,.14*s,.14*s,0x605b4c,x,y+.12*s,z,p)}
+function cathedral(x,z,large=false){const p=new THREE.Group();p.position.set(x,0,z);world.add(p);p.scale.setScalar(large?1:.63);const stone=0xc2b796,trim=0xe5d5af;box(8,6,3.3,stone,0,3,0,p);roof(8,.9,3.5,0x9b7660,0,6,0,p);for(const xx of [-4.5,4.5]){box(2.5,8.8,3.8,stone,xx,4.4,0,p);for(let j=0;j<4;j++)box(2.75,.16,4,trim,xx,1.5+j*1.9,0,p);box(1.1,1.8,.08,0x3e4c42,xx,7.1,1.96,p);cyl(.9,1.5,.6,trim,xx,9.1,0,p,8);cyl(.4,.9,1.4,stone,xx,10,0,p,8);cyl(0,.55,1.2,0x766f5a,xx,11.2,0,p,8);cross(xx,12,0,.65,p)}for(const xx of [-3.7,-2,2,3.7]){box(.25,5.7,.35,trim,xx,3.1,1.85,p);box(.45,.3,.65,trim,xx,5.9,1.85,p)}for(let i=0;i<5;i++)box(7-i*1.15,.7,.55,trim,0,6.2+i*.65,1.8,p);cross(0,9.8,1.8,.8,p);box(1.2,2.6,.12,0x3d5047,0,1.3,1.73,p);for(const xx of [-2.6,2.6])box(.95,1.8,.1,0x48645b,xx,3.8,1.73,p);const rose=cyl(.72,.72,.12,0x567a73,0,4.65,1.77,p,24);rose.rotation.x=Math.PI/2;const ring=mesh(new THREE.TorusGeometry(.77,.12,8,28),trim,0,4.65,1.87,p);for(let i=0;i<8;i++){let a=i*Math.PI/4;beam([0,4.65,1.94],[Math.cos(a)*.66,4.65+Math.sin(a)*.66,1.94],.035,trim,p)}for(let i=0;i<6;i++)box(9+i*.7,.2,1.5+i*.6,0xc5bca2,0,.65-i*.13,3+i*.25,p);return p}
+function fortress(x,z){const p=new THREE.Group();p.position.set(x,0,z);p.scale.setScalar(.85);world.add(p);const stone=0xb7b493,trim=0xd6ccaa;box(8,5.2,5,stone,0,2.6,0,p);roof(7.4,1.7,5.2,0x907459,0,5.2,0,p);for(const xx of [-4,4]){box(2,6.4,4.8,stone,xx,3.2,0,p);for(let i=0;i<4;i++)box(.4,.65,.65,trim,xx-.75+i*.5,6.7,2.1,p);box(.55,1.6,.08,0x46554a,xx,4.8,2.46,p)}box(3.7,3.6,1.6,stone,0,1.8,3,p);roof(4.3,1.9,1.8,trim,0,3.6,3,p);box(1.3,2.5,.1,0x49564b,0,1.25,3.87,p);for(const xx of [-1.1,1.1])box(.2,3,.15,trim,xx,1.5,3.94,p);for(let i=0;i<4;i++)box(5+i*.6,.15,1.4+i*.4,trim,0,.4-i*.1,4.2+i*.15,p);return p}
+function waymark(x,z){const p=new THREE.Group();p.position.set(x,0,z);world.add(p);box(.7,1.4,.6,0xb9bca4,0,.7,0,p);const yellow=0xe9be48;for(let i=-2;i<=2;i++){const a=(i+3)*.35;beam([0,1,.33],[Math.cos(a)*.25,1+Math.sin(a)*.25,.33],.025,yellow,p)}box(.35,.06,.03,yellow,0,.75,.33,p);return p}
+function build(index){scene.remove(world);world.traverse(o=>{if(o.isMesh)o.geometry.dispose()});world=new THREE.Group();scene.add(world);animated=[];const c=places[index];scene.background=new THREE.Color(c.color);scene.fog=new THREE.Fog(c.color,45,110);ground(index===1?0xc3b48b:index===4?0xa7a589:0x889b73);const glow=mesh(new THREE.SphereGeometry(2.5,24,16),new THREE.MeshBasicMaterial({color:0xffe3a8}),-16,17,-28);glow.castShadow=false;
+if(c.kind==='porto'){water(0,2,37,7);bridge(0,2,15,true);for(let i=0;i<12;i++){const side=i<6?-1:1;const n=i%6;const h=2.8+(n%3)*.8;const q=house((n-2.5)*3.1,-5.5-side*3,2.4,h,[0xe8c39a,0x80a9ae,0xcd997c,0xd6b96f][i%4]);q.position.y=Math.abs(n-2.5)*.25}for(let i=0;i<6;i++)tree(-15+i*6,-15,.7,false);const boat=new THREE.Group();world.add(boat);boat.position.set(-8,.4,3.7);const hull=sphere(1,0x744c34,0,0,0,boat,1.8,.25,.45);box(1.4,.08,.6,0xd9a667,0,.15,0,boat)}
+if(c.kind==='coast'){water(-8,0,21,42);for(let i=0;i<35;i++){const z=-15+i*.9,x=2.5+Math.sin(i*.12)*2;box(2.8,.14,.7,0x9e805a,x,.3,z);if(i%3===0)for(const side of [-1.35,1.35]){box(.1,1,.1,0xc2aa7a,x+side,.7,z);beam([x+side,.95,z],[x+side,.95,z+2.7],.045,0xdac495)}}for(let i=0;i<35;i++){const x=6+(i*2.7)%13,z=-17+(i*5.3)%34;sphere(1.2+i%2,0xd4c69b,x,.25,z,world,1.2,.25,.8);for(let j=0;j<3;j++)cyl(.01,.035,.5,0x75855d,x+j*.15,.6,z+j*.2,world,4)}waymark(4,8);for(let i=0;i<6;i++){const bird=new THREE.Group();bird.position.set(-5+i*2,7+i%2,-8+i);world.add(bird);beam([-.45,0,0],[0,.15,0],.025,0xffefce,bird);beam([0,.15,0],[.45,0,0],.025,0xffefce,bird);animated.push({mesh:bird,type:'bird',base:bird.position.y,phase:i})}}
+if(c.kind==='tui'){water(0,4,40,6);bridge(-2,4,16,false);const hill=sphere(9,0x82976e,1,.8,-8,world,1,.24,.8);const cat=fortress(0,-8);cat.position.y=2.3;for(let i=0;i<8;i++){const h=house(-10+i*2.8,-3.3,1.9,2+i%2,0xd9c299);h.position.y=.4}for(let i=0;i<10;i++)tree(-17+i*3.8,-14,.7,false);waymark(8,9)}
+if(c.kind==='forest'){for(let i=0;i<28;i++){const z=-18+i*1.3,x=Math.sin(i*.2)*3;box(3.8,.08,1.5,0xc9b58b,x,.08,z)}for(let i=0;i<28;i++){const z=-18+(i%14)*2.9,x=(i<14?-1:1)*(5+(i*2.2)%7);tree(x,z,.9+(i%4)*.18,true)}for(let i=0;i<18;i++){let x=-10+(i*3.37)%20,z=-14+(i*5.83)%28;if(Math.abs(x)>4)sphere(.5+i%3*.2,0x7e8c73,x,.3,z,world,1.3,.65,1)}waymark(3.3,5);box(2,.2,.6,0x9e8661,-4,.7,6);box(.2,.7,.4,0x7f6e50,-4.7,.3,6);box(.2,.7,.4,0x7f6e50,-3.3,.3,6)}
+if(c.kind==='santiago'){box(23,.12,21,0xc6bda3,0,.05,1);{const tiles=new THREE.InstancedMesh(new THREE.BoxGeometry(.98,.018,.97),mat(0xffffff),342);const matrix=new THREE.Matrix4();let n=0;for(let i=-9;i<10;i++)for(let j=-8;j<10;j++){matrix.makeTranslation(i*1.12,.13,j*1.12);tiles.setMatrixAt(n,matrix);tiles.setColorAt(n++,new THREE.Color((i+j)%3?0xc7bfa7:0xb7b29b))}tiles.receiveShadow=true;world.add(tiles)}cathedral(0,-4,true);for(const side of [-1,1])for(let i=0;i<4;i++){const h=house(side*12,-6+i*4,3.7,4.2,0xbbad8d);h.rotation.y=-side*Math.PI/2}for(const x of [-8,8]){cyl(.11,.16,3.2,0x5b6354,x,1.7,6);box(.5,.7,.5,0xf1d6a0,x,3.5,6);cyl(0,.45,.35,0x5b6354,x,4,6,world,4)}}
+resetCamera();canvas.dataset.chapter=''+index;canvas.dataset.ready='true';}
+function resize(){dirty=true;const r=canvas.getBoundingClientRect(),w=r.width,h=r.height;renderer.setSize(w,h,false);camera.aspect=w/h;camera.clearViewOffset();if(innerWidth>768)camera.setViewOffset(w,h,-w*.11,0,w,h);camera.updateProjectionMatrix();controls.update()}
+function resetCamera(){controls.autoRotate=false;controls.enableDamping=false;camera.position.set(...places[selected].camera);controls.target.set(0,2,0);controls.update();resize();canvas.dataset.camera=JSON.stringify(camera.position.toArray())}
+window.addEventListener('resize',resize);canvas.addEventListener('keydown',e=>{if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home'].includes(e.key))return;e.preventDefault();if(e.key==='Home'){resetCamera();return}const offset=camera.position.clone().sub(controls.target);const sph=new THREE.Spherical().setFromVector3(offset);sph.theta+=e.key==='ArrowLeft'?.15:e.key==='ArrowRight'?-.15:0;sph.phi=THREE.MathUtils.clamp(sph.phi+(e.key==='ArrowUp'?-.1:e.key==='ArrowDown'?.1:0),.15,Math.PI*.47);camera.position.copy(controls.target).add(new THREE.Vector3().setFromSpherical(sph));controls.update()});
+function persist(){try{localStorage.setItem('camino-stamps',JSON.stringify([...stamps]));localStorage.setItem('camino-seen',JSON.stringify([...seen]))}catch{}}
+function render(){const c=places[selected];seen.add(selected);persist();$('#chapter').value=''+selected;$('#position').textContent=`${selected+1} of ${places.length}`;$('#collected').textContent=`${stamps.size} / 5 stamps`;$('#place').textContent=c.name;$('#detail').textContent=c.detail;$('#stamp').textContent=stamps.has(selected)?'Memory collected ✓':'Collect memory';$('#stamp').setAttribute('aria-pressed',''+stamps.has(selected));$('#prev').disabled=selected===0;$('#next').disabled=selected===4;build(selected)}
+places.forEach((c,i)=>$('#chapter').add(new Option(c.name,''+i)));$('#chapter').onchange=e=>{selected=+e.target.value;render()};$('#prev').onclick=()=>{selected=Math.max(0,selected-1);render()};$('#next').onclick=()=>{selected=Math.min(4,selected+1);render()};$('#stamp').onclick=()=>{if(stamps.has(selected))stamps.delete(selected);else stamps.add(selected);persist();$('#collected').textContent=`${stamps.size} / 5 stamps`;$('#stamp').textContent=stamps.has(selected)?'Memory collected ✓':'Collect memory';$('#stamp').setAttribute('aria-pressed',''+stamps.has(selected));notify('Memory collection saved in this browser')};$('#reset').onclick=resetCamera;
+$('#theme').onclick=()=>{document.body.classList.toggle('dark');$('#theme').textContent=document.body.classList.contains('dark')?'Light UI':'Dark UI'};function updateMotion(){document.body.dataset.motion=motion?'playing':'paused';$('#motion').textContent=motion?'Pause motion':'Play motion'}$('#motion').onclick=()=>{motion=!motion;updateMotion()};updateMotion();
+let toastTimer;function notify(s){$('#status').textContent=s;$('#status').classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#status').classList.remove('show'),2200)}
+let priorFocus;function openPanel(html){priorFocus=document.activeElement;$('#panel-content').innerHTML=html;$('#panel').showModal();$('#close').focus()}$('#close').onclick=()=>$('#panel').close();$('#panel').addEventListener('close',()=>priorFocus?.focus());$('#diary').onclick=()=>openPanel(`<h2>A fictional trail diary</h2><p>${diary[selected]}</p><h3>Look a little closer</h3><p>${places[selected].detail}</p><p class="source-note">Place background: <a href="${places[selected].source}" target="_blank" rel="noopener">${places[selected].sourceName}</a>.</p><p class="source-note">The first-person diary is imagined writing, not a claim that you or the author made this walk. These five scenes combine coastal and inland inspirations, not one waymarked itinerary. There is no fixed distance or day count. The coastal route enters Galicia at A Guarda; the inland route crosses at Tui. Both continue through Pontevedra after meeting at Redondela. Check official route and local conditions before planning a walk.</p>`);
+const reflections={healing:'Walk gently. Notice what feels easier when you stop asking the next step to solve everything. You can pause without losing the path.',clarity:'Choose one small question to carry today. Leave room for the answer to change as you walk.',connection:'Think of a person who made an ordinary day kinder. What simple kindness could you pass on?',gratitude:'Name one small comfort you might otherwise miss: shade, water, a dry pair of socks. Let that be enough for this moment.'};$('#reflect').onclick=()=>{openPanel(`<h2>Choose your Camino intention</h2><p>A short reflection to take at your own pace.</p><form id="intention-form"><label for="intention">My intention is to...</label><select id="intention" name="intention"><option value="healing">heal and reset</option><option value="clarity">find clarity</option><option value="connection">feel human connection</option><option value="gratitude">grow gratitude</option></select><button>Receive reflection</button></form><article class="reflection-card" aria-live="polite" id="reflection-card">Your reflection awaits.</article><p class="source-note">${seen.size} / 5 places explored. Memory stamps stay in this browser.</p>`);$('#intention-form').onsubmit=e=>{e.preventDefault();$('#reflection-card').textContent=reflections[$('#intention').value]}};
+let audio=null;const sound={on:false,ctx:null};$('#sound').onclick=async()=>{if(sound.on){await sound.ctx.close();sound.on=false;sound.ctx=null;audio=null}else{const AC=window.AudioContext||window.webkitAudioContext;const ctx=new AC();await ctx.resume();const buffer=ctx.createBuffer(1,ctx.sampleRate*3,ctx.sampleRate);const data=buffer.getChannelData(0);let last=0;for(let i=0;i<data.length;i++){last=(last+(Math.random()*2-1)*.018)/1.018;data[i]=last*.6}const src=ctx.createBufferSource();src.buffer=buffer;src.loop=true;const filter=ctx.createBiquadFilter();filter.type='lowpass';filter.frequency.value=650;const gain=ctx.createGain();gain.gain.setValueAtTime(0,ctx.currentTime);gain.gain.linearRampToValueAtTime(.26,ctx.currentTime+1);src.connect(filter).connect(gain).connect(ctx.destination);src.start();sound.ctx=ctx;sound.on=true;audio={src,filter,gain};}$('#sound').textContent=sound.on?'Sound off':'Sound on';$('#sound').setAttribute('aria-pressed',''+sound.on)};
+window.camino={get selected(){return selected},get sound(){return sound},camera,controls,renderer,reset:resetCamera};
+let last=performance.now(),elapsed=0,lastRendered=0;function tick(now){requestAnimationFrame(tick);const dt=Math.min(.05,(now-last)/1000);last=now;if(motion)elapsed+=dt;for(const a of animated){if(a.type==='wave')a.mesh.position.x=a.base+Math.sin(elapsed*.5+a.phase)*.2;if(a.type==='bird')a.mesh.position.y=a.base+Math.sin(elapsed*.8+a.phase)*.15}if((motion&&animated.length||dirty)&&now-lastRendered>40){renderer.render(scene,camera);dirty=false;lastRendered=now}canvas.dataset.camera=JSON.stringify(camera.position.toArray())}render();requestAnimationFrame(tick);
