@@ -1,19 +1,27 @@
-# Elcamino
+# El Camino
 
-An immersive, first-person web experience inspired by the **Camino Portugués** from Porto (Portugal) to Santiago de Compostela (Spain).
+Five freely orbitable low-poly scenes inspired by Porto, the Portuguese Atlantic coast, Tui, paths toward Pontevedra and Santiago de Compostela. An illustrated companion, not a navigation map or an exact architectural reconstruction.
 
-## Experience goals
+## Run
 
-- Joyful, emotionally rich storytelling in first person.
-- Clean and refined visual design.
-- Accessibility-forward implementation (semantic HTML, keyboard-friendly controls, reduced-motion support, live region updates).
-- Lightweight architecture with progressive enhancement.
-- Low-clutter engagement mechanics (journey progress companion, memory stamps, adaptive visual mood).
+Node 22+, `npm ci`, `npm run dev`. Production: `npm run build`, output `dist`. No API keys, paid services or external audio requests.
 
-## Run locally
+Drag to explore 360 degrees, scroll to zoom, arrow keys to orbit, Home or Reset view to return to each scene's composed view. Motion and generated wind are separate opt-ins; reduced motion starts paused and sound always starts off. Memory stamps and visited places persist only in the current browser. Read the diary and choose one of four reflections.
 
-```bash
-python3 -m http.server 4173
-```
+The inherited first-person diary is explicitly fictional. These scenes mix coastal and inland inspirations, not a single waymarked itinerary. The coastal route enters Galicia at A Guarda; Tui is on the inland Portuguese Way. Both meet at Redondela. No fixed 260 km / 14 day claim is retained. Original static files are preserved in `legacy/`.
 
-Then open: <http://localhost:4173>
+## Sources
+
+- https://www.caminodesantiago.gal/en/make-plans/the-ways/portuguese-way
+- https://www.caminodesantiago.gal/en/make-plans/the-ways/portuguese-coastal-way
+- https://www.santiagoturismo.com/videoguias/fachada-de-la-catedral
+- https://www.visitportugal.com/en/print/sugestao/73735
+- https://tui.gal/en/turismo/vive-e-conoce/santa-maria-cathedral
+
+## Verification
+
+`npm test` runs the Chromium UI matrix at WIDTH (default 390), with CHROME optionally pointing to a browser binary. Five scenes x two themes x two motion settings, actual pointer drag and settled Reset, keyboard, diary, four intention reflections, memory collection persistence, no horizontal overflow, minimum 14px visible UI labels and silent start. Local 390 and 1440 matrices pass. Contrast evidence in `verification/contrast.json`: 465 visible UI text samples across 32 screenshots, minimum 7.69:1 measured from rendered glyph masks and underlying backdrop pixels, excluding scene geometry. Real screenshots inspected at phone and desktop.
+
+Audio: actual 14-second browser output captured, silent before opt-in, context closed on off, replay checked. Human listening is still unsigned; no claim of listened quality is made.
+
+Cloudflare Pages target: GitHub-connected, `npm run build`, `dist`, free tier. Prior Vercel URL retained unchanged: https://elcamino-r1ne8t725-rajeshceg3s-projects.vercel.app/
