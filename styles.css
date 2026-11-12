@@ -10,3 +10,5 @@ body.quiet-ready:not(.chrome-on) main{height:100dvh}
 #chrome-hint:hover{opacity:.85}
 @keyframes hint-bob{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(3px)}}
 @media(prefers-reduced-motion:reduce){#chrome-hint{animation:none!important}}
+
+body.quiet-ready:not(.chrome-on) .world-note{top:48px}
